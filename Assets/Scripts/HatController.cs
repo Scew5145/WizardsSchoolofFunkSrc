@@ -22,6 +22,8 @@ public class HatController : MonoBehaviour {
 	private float timePerQ;
 	private int qIter = 1;
 	private int mIter = 1;
+	private int[] spellArray = {0,0,0,0};
+	private int spellIter = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -40,15 +42,21 @@ public class HatController : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void FixedUpdate () {
+    void Update () {
 		float moveHorizontal = Input.GetAxis("Horizontal");
-		if (Input.GetAxis("Fire1") == 1)
+		if (Input.GetButtonDown("Fire1"))
 		{
+			if (spellIter < 4) {
+				spellArray [spellIter] = 1;
+				spellIter++;
+			}
+			/*
 			GameObject newBall = Instantiate(fireball, transform.position, transform.rotation);
 			float randomizer = Random.value*1000;
             comboCount += 1;
 			newBall.GetComponent<Rigidbody2D>().AddForce(new Vector2(500, randomizer));
 			Destroy(newBall, 1);
+			*/
 		}
         if (comboCount >= 100)
         {
@@ -66,10 +74,19 @@ public class HatController : MonoBehaviour {
 	void QueueUp(){
 		print ("beep"+ qIter);
 		if (qIter % 4 == 1){
-			GameObject newBall = Instantiate(fireball, transform.position, transform.rotation);
-			newBall.GetComponent<Rigidbody2D>().AddForce(new Vector2(500, 200));
-			Destroy (newBall, 1);
-			print ("fire!");
+			for (int i = 0; i < spellArray.Length; i++) {
+				if (spellArray [i] == 1) {
+					GameObject newBall = Instantiate(fireball, transform.position, transform.rotation);
+					float randomizer = Random.value*1000;
+					comboCount += 1;
+					newBall.GetComponent<Rigidbody2D>().AddForce(new Vector2(500, randomizer));
+					Destroy (newBall, 1);
+					print ("fire!");
+				}
+				spellArray [i] = 0;
+			}
+			qIter = 1;
+			spellIter = 0;
 		}
 		qIter++;
 	}
