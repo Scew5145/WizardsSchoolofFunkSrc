@@ -25,6 +25,61 @@ public class HatController : MonoBehaviour {
 	private int[] spellArray = {0,0,0,0};
 	private int spellIter = 0;
 
+	class SongChunk {
+		private int bpm;
+		private float length;
+		private string[] files = new string[3];
+		private float[] beatmap;
+		private float startTime;
+		private float musicHitRadius = 67.5f;
+		private float musicNearHitRadius = 125f;
+
+		public SongChunk(int _bpm, string[] _files, float[] _beatmap) {
+			//???
+		}
+		public SongChunk(int _bpm, string[] _files, float[] _beatmap, float _musicHitRadius, float _musicNearHitRadius) {
+			//???
+		}
+
+		public float calcWeight(float currentTime){
+			float offset = currentTime - startTime;
+			int prevBeat = 0;
+			for (int i = 0; i < beatmap.Length()-1; i++) {
+				if (offset <= beatmap) {
+					break;
+				} else {
+					prevBeat = i;
+				}
+			}
+			float timeSincePrev = offset - beatmap [prevBeat];
+			float timeTillNext = beatmap [prevBeat + 1] - offset;
+			float theBeat;
+			float theError;
+			if (timeSincePrev <= timeTillNext) {
+				theBeat = beatmap [prevBeat];
+				theError = timeSincePrev;
+			} else {
+				theBeat = beatmap [prevBeat + 1];
+				theError = timeTillNext;
+			}
+			if (theError <= musicHitRadius) {
+				return 1.0f;
+			}
+			else if (theError <= musicNearHitRadius){
+				return 1.0f - (theError - musicHitRadius)*(0.9/(musicNearHitRadius - musicHitRadius));
+			}
+			else {
+				return 0.1f;
+			}
+		}
+		public float getLength() {
+			return length;
+		}
+		public float getStartTime() {
+			return startTime;
+		}
+	}
+
 	// Use this for initialization
 	void Start () {
 		timePerQ = 60 / bpm;
